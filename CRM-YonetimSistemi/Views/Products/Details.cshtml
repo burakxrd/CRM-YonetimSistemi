@@ -1,0 +1,72 @@
+﻿@model CRMYonetimSistemi.Models.Product
+
+@{
+    ViewData["Title"] = "Ürün Detayları";
+}
+
+<h1>Ürün Detayları</h1>
+
+<div>
+    <h4>@Model.Name</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.ProductPriceInUSD)
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.ProductPriceInUSD)
+        </dd>
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.Kg)
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.Kg)
+        </dd>
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.ShippingCostPerKg)
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.ShippingCostPerKg)
+        </dd>
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.ExchangeRate)
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.ExchangeRate)
+        </dd>
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.DefaultSellingPrice)
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.DefaultSellingPrice)
+        </dd>
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.Stock)
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.Stock)
+        </dd>
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.CalculatedCost)
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.CalculatedCost)
+        </dd>
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.CreatedAt)
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.CreatedAt)
+        </dd>
+    </dl>
+</div>
+<div class="mt-4">
+    <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-warning">Düzenle</a> |
+    <a asp-action="Index" class="btn btn-secondary">Listeye Geri Dön</a>
+</div>

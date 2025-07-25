@@ -1,0 +1,59 @@
+﻿@model IEnumerable<CRMYonetimSistemi.Models.Product>
+
+@{
+    ViewData["Title"] = "Ürünler";
+}
+
+<h1>Ürün Listesi</h1>
+
+<p>
+    @* "Yeni Ürün Ekle" sayfasına yönlendiren bir link oluşturur. *@
+    <a asp-action="Create" class="btn btn-primary">Yeni Ürün Ekle</a>
+</p>
+<table class="table table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>
+                @* Modeldeki "Name" özelliğinin başlığını gösterir. *@
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CalculatedCost) (₺)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DefaultSellingPrice) (₺)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Stock)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @* Modeldeki her bir ürün için bir tablo satırı oluşturur. *@
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @* Ürünün adını gösterir. *@
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CalculatedCost)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DefaultSellingPrice)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Stock)
+                </td>
+                <td>
+                    @* Her satır için Düzenle, Detaylar ve Sil linkleri oluşturur. *@
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Düzenle</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Detaylar</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Sil</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

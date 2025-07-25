@@ -1,0 +1,57 @@
+# Visual Studio ve .NET Core için standart .gitignore dosyası
+
+## Kullanıcıya özel dosyalar
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+## Visual Studio'nun gizli ayar ve önbellek klasörü
+## Bu satır, içindeki "turkchinewebapp" kalıntıları dahil her şeyi görmezden gelecek.
+.vs/
+
+## Build sonuçları
+[Bb]in/
+[Oo]bj/
+
+## Yerel geliştirme ayarları dosyası (hassas veriler içerebilir)
+appsettings.Development.json
+
+## Rider ve ReSharper dosyaları
+.idea/
+*.sln.iml
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+## Diğerleri
+*.dbmdl
+*.log
+*.tmp
+*.vspscc
+*.vssscc
+*.pidb
+*.scc
+*.pyc
+*.pyo
+*.swp
+*~
+*.bak
+*.ncb
+*~
+*.orig
+*.pdb
+*.orig
+*DS_Store
+
+## Paket ve bağımlılık klasörleri
+/packages/
+/node_modules/
+
+## Build klasörleri
+[Bb]uild/
+[Dd]ebug/
+[Rr]elease/
+
+## MSTest Test Sonuçları
+[Tt]est[Rr]esult*/

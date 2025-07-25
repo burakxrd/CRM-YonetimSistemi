@@ -1,0 +1,61 @@
+﻿@model CRMYonetimSistemi.Models.Sale
+
+@{
+    ViewData["Title"] = "Satış Detayları";
+}
+
+<h1>Satış Detayları</h1>
+
+<div>
+    <h4>Satış Bilgileri</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Customer)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Customer!.Name)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.SaleDate)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.SaleDate)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.TotalAmount)
+        </dt>
+        <dd class="col-sm-10">
+            @Model.TotalAmount.ToString("C")
+        </dd>
+    </dl>
+</div>
+
+<h4 class="mt-4">Satılan Ürünler</h4>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Ürün Adı</th>
+            <th>Adet</th>
+            <th>Birim Fiyat</th>
+            <th>Satır Toplamı</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.SaleItems)
+        {
+            <tr>
+                <td>@item.Product!.Name</td>
+                <td>@item.Quantity</td>
+                <td>@item.UnitPrice.ToString("C")</td>
+                <td>@((item.Quantity * item.UnitPrice).ToString("C"))</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+<div>
+    <a asp-action="Index" class="btn btn-secondary">Listeye Geri Dön</a>
+</div>
+

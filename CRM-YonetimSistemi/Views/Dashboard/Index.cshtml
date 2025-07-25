@@ -1,0 +1,160 @@
+﻿@model CRMYonetimSistemi.ViewModels.DashboardViewModel
+
+@{
+    ViewData["Title"] = "Kontrol Paneli";
+}
+
+<div class="container-fluid">
+    <h1 class="mt-4">@ViewData["Title"]</h1>
+
+    <!-- Metrik Kartları -->
+    <div class="row">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Ciro</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.TotalRevenue.ToString("C", new System.Globalization.CultureInfo("tr-TR"))</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-danger shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Toplam Gider</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.TotalExpenses.ToString("C", new System.Globalization.CultureInfo("tr-TR"))</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Net Kar</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.NetProfit.ToString("C", new System.Globalization.CultureInfo("tr-TR"))</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Toplam Müşteri</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.TotalCustomers</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- İkinci Sıra Kartlar -->
+    <div class="row">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Kalan Alacak</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.RemainingReceivables.ToString("C", new System.Globalization.CultureInfo("tr-TR"))</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-secondary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">Güncel Bakiye (Ciro-Gider)</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.CurrentBalance.ToString("C", new System.Globalization.CultureInfo("tr-TR"))</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- İçerik Alanı -->
+    <div class="row">
+        <!-- En Çok İş Yapılan Müşteriler -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">En Çok İş Yapılan Müşteriler</h6>
+                </div>
+                <div class="card-body">
+                    @if (Model.TopCustomers.Any())
+                    {
+                        <ul class="list-group list-group-flush">
+                            @foreach (var customer in Model.TopCustomers)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    @customer.CustomerName
+                                    <span class="badge bg-primary rounded-pill">@customer.TotalAmount.ToString("N2") ₺</span>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p>Henüz görüntülenecek müşteri verisi yok.</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Stoğu Azalan Ürünler -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-danger">Stoğu Azalan Ürünler (10'dan az)</h6>
+                </div>
+                <div class="card-body">
+                    @if (Model.LowStockProducts.Any())
+                    {
+                        <ul class="list-group list-group-flush">
+                            @foreach (var product in Model.LowStockProducts)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    @product.Name
+                                    <span class="badge bg-danger rounded-pill">Stok: @product.Stock</span>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p>Stoğu azalan ürün bulunmuyor.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Kartların solundaki renkli çizgiler için basit CSS -->
+<style>
+    .border-left-primary { border-left: .25rem solid #4e73df!important; }
+    .border-left-success { border-left: .25rem solid #1cc88a!important; }
+    .border-left-info { border-left: .25rem solid #36b9cc!important; }
+    .border-left-warning { border-left: .25rem solid #f6c23e!important; }
+    .border-left-danger { border-left: .25rem solid #e74a3b!important; }
+    .border-left-secondary { border-left: .25rem solid #858796!important; }
+</style>

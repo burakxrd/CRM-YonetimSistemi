@@ -1,0 +1,47 @@
+﻿<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
+<!-- cldr.js: Kültür verilerini yönetmek için temel kütüphane -->
+<script src="https://unpkg.com/cldrjs@0.5.1/dist/cldr.min.js"></script>
+<!-- cldr'ın olay ve veri modülleri -->
+<script src="https://unpkg.com/cldrjs@0.5.1/dist/cldr/event.min.js"></script>
+<script src="https://unpkg.com/cldrjs@0.5.1/dist/cldr/supplemental.min.js"></script>
+<!-- globalize.js: Sayı, tarih vb. formatlama kütüphanesi -->
+<script src="https://unpkg.com/globalize@1.5.0/dist/globalize.min.js"></script>
+<script src="https://unpkg.com/globalize@1.5.0/dist/globalize/number.min.js"></script>
+<script src="https://unpkg.com/globalize@1.5.0/dist/globalize/date.min.js"></script>
+<!-- jquery-validation-globalize: jQuery validation'ı globalize ile entegre eder -->
+<script src="https://cdn.jsdelivr.net/npm/jquery-validation-globalize/jquery.validate.globalize.min.js"></script>
+<!-- ====================================================================== -->
+
+<script type="text/javascript">
+    // Bu script, Türkçe kültür verilerini yükler ve jQuery Validation'ı bu kültüre göre ayarlar.
+    $(function () {
+        // Türkçe (tr) kültür verilerini CDN'den çekiyoruz
+        $.when(
+            $.get("https://unpkg.com/cldr-dates-full@36.0.0/main/tr/ca-gregorian.json"),
+            $.get("https://unpkg.com/cldr-numbers-full@36.0.0/main/tr/numbers.json"),
+            $.get("https://unpkg.com/cldr-core@36.0.0/supplemental/likelySubtags.json"),
+            $.get("https://unpkg.com/cldr-core@36.0.0/supplemental/numberingSystems.json")
+        ).done(function (gregorian, numbers, likelySubtags, numberingSystems) {
+            // Çekilen JSON verilerini CLDR'a yüklüyoruz
+            Cldr.load(gregorian[0]);
+            Cldr.load(numbers[0]);
+            Cldr.load(likelySubtags[0]);
+            Cldr.load(numberingSystems[0]);
+
+            // Globalize için Türkçe kültürünü ayarlıyoruz
+            Globalize.locale('tr');
+
+            // jQuery Validation için varsayılan metotları globalize'ın metotlarıyla değiştiriyoruz.
+            // Bu sayede virgüllü sayıları ve TR formatındaki tarihleri anlar.
+            $.validator.methods.date = function (value, element) {
+                return this.optional(element) || Globalize.parseDate(value, { date: "short" }) instanceof Date;
+            };
+
+            $.validator.methods.number = function (value, element) {
+                return this.optional(element) || !isNaN(Globalize.parseNumber(value));
+            };
+        });
+    });
+</script>

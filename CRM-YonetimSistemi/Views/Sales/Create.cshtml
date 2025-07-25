@@ -1,0 +1,107 @@
+﻿@model CRMYonetimSistemi.ViewModels.CreateSaleViewModel
+
+@{
+    ViewData["Title"] = "Yeni Satış Ekle";
+    // Ürün listesini JavaScript'te kullanmak için JSON formatına çeviriyoruz.
+    var productsJson = Json.Serialize(Model.AvailableProducts.Select(p => new { p.Id, p.Name, p.EffectiveSellingPrice, p.Stock }));
+}
+
+<h1>Yeni Satış Ekle</h1>
+<hr />
+
+<form asp-action="Create">
+    @* Genel hata mesajları ve ürün eklenmemişse gösterilecek hata için *@
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="text-danger" asp-validation-for="Items"></div>
+
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group mb-3">
+                <label asp-for="CustomerId" class="control-label"></label>
+                @* Müşteri dropdown listesi *@
+                <select asp-for="CustomerId" class="form-control" asp-items="@(new SelectList(Model.AvailableCustomers, "Id", "Name"))">
+                    <option value="">-- Müşteri Seçin --</option>
+                </select>
+                <span asp-validation-for="CustomerId" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group mb-3">
+                <label asp-for="SaleDate" class="control-label"></label>
+                <input asp-for="SaleDate" class="form-control" type="date" />
+                <span asp-validation-for="SaleDate" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+
+    <h4 class="mt-4">Satılan Ürünler</h4>
+    @* Dinamik olarak ürün satırlarının ekleneceği konteyner *@
+    <div id="saleItemsContainer">
+        <!-- Dinamik satırlar buraya eklenecek -->
+    </div>
+
+    <button type="button" id="addItemBtn" class="btn btn-success mt-2">Yeni Ürün Ekle</button>
+
+    <div class="form-group mt-4">
+        <input type="submit" value="Satışı Kaydet" class="btn btn-primary" />
+        <a asp-action="Index" class="btn btn-secondary">Listeye Geri Dön</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function () {
+            // Controller'dan gelen ürün verilerini JavaScript değişkenine alıyoruz
+            const products = JSON.parse('@Html.Raw(productsJson)');
+            let itemIndex = 0;
+
+            // Satırları sildikten sonra indisleri yeniden düzenleyen fonksiyon
+            function updateRowIndices() {
+                $('#saleItemsContainer .sale-item-row').each(function(index, row) {
+                    // Her satırdaki 'name' attribute'ünü doğru index ile günceller
+                    $(row).find('select').attr('name', `Items[${index}].ProductId`);
+                    $(row).find('input').attr('name', `Items[${index}].Quantity`);
+                });
+                // Bir sonraki eklenecek satırın indisini ayarlar
+                itemIndex = $('#saleItemsContainer .sale-item-row').length;
+            }
+
+            // 'Yeni Ürün Ekle' butonuna tıklandığında çalışır
+            $('#addItemBtn').click(function () {
+                // Yeni satırın HTML'ini oluşturur
+                var newRow = `
+                    <div class="row sale-item-row mb-2">
+                        <div class="col-md-7">
+                             <label>Ürün</label>
+                            <select name="Items[${itemIndex}].ProductId" class="form-control product-select">
+                                <option value="">-- Ürün Seçin --</option>
+                                ${products.map(p => `<option value="${p.id}">${p.name} (Stok: ${p.stock})</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label>Adet</label>
+                            <input type="number" name="Items[${itemIndex}].Quantity" class="form-control quantity-input" min="1" value="1"/>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="button" class="btn btn-danger remove-item-btn">Kaldır</button>
+                        </div>
+                    </div>`;
+
+                // Yeni satırı konteynere ekler
+                $('#saleItemsContainer').append(newRow);
+                itemIndex++; // Bir sonraki indis için sayacı artır
+            });
+
+            // 'Kaldır' butonuna tıklandığında çalışır
+            $('#saleItemsContainer').on('click', '.remove-item-btn', function () {
+                $(this).closest('.sale-item-row').remove();
+                updateRowIndices(); // Satır silindikten sonra indisleri güncelle
+            });
+
+            // Sayfa ilk yüklendiğinde bir tane boş ürün satırı ekle
+            $('#addItemBtn').click();
+        });
+    </script>
+}

@@ -1,0 +1,116 @@
+﻿@model CRMYonetimSistemi.ViewModels.EditSaleViewModel
+
+@{
+    ViewData["Title"] = "Satış Kaydını Düzenle";
+    var productsJson = Json.Serialize(Model.AvailableProducts.Select(p => new { p.Id, p.Name, p.EffectiveSellingPrice, p.Stock }));
+}
+
+<h1>Satış Kaydını Düzenle</h1>
+<hr />
+
+<div id="page-data-holder"
+     data-products='@productsJson'
+     data-item-count="@Model.Items.Count"
+     style="display: none;">
+</div>
+
+
+<form asp-action="Edit">
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <input type="hidden" asp-for="Id" />
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group mb-3">
+                <label asp-for="CustomerId" class="control-label"></label>
+                <select asp-for="CustomerId" class="form-control" asp-items="@(new SelectList(Model.AvailableCustomers, "Id", "Name"))"></select>
+                <span asp-validation-for="CustomerId" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group mb-3">
+                <label asp-for="SaleDate" class="control-label"></label>
+                <input asp-for="SaleDate" class="form-control" type="date" />
+                <span asp-validation-for="SaleDate" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+
+    <h4 class="mt-4">Satılan Ürünler</h4>
+    <div id="saleItemsContainer">
+        @for (int i = 0; i < Model.Items.Count; i++)
+        {
+            <div class="row sale-item-row mb-2">
+                <div class="col-md-7">
+                    <label>Ürün</label>
+                    <select name="Items[@i].ProductId" class="form-control product-select">
+                        @foreach (var product in Model.AvailableProducts)
+                        {
+                            <option value="@product.Id" selected="@(product.Id == Model.Items[i].ProductId)">@product.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label>Adet</label>
+                    <input type="number" name="Items[@i].Quantity" value="@Model.Items[i].Quantity" class="form-control quantity-input" min="1" />
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="button" class="btn btn-danger remove-item-btn">Kaldır</button>
+                </div>
+            </div>
+        }
+    </div>
+
+    <button type="button" id="addItemBtn" class="btn btn-success mt-2">Yeni Ürün Ekle</button>
+
+    <div class="form-group mt-4">
+        <input type="submit" value="Değişiklikleri Kaydet" class="btn btn-primary" />
+        <a asp-action="Index" class="btn btn-secondary">Listeye Geri Dön</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function () {
+            const dataHolder = $('#page-data-holder');
+            const products = dataHolder.data('products');
+            let itemIndex = dataHolder.data('item-count');
+
+            function updateRowIndices() {
+                $('#saleItemsContainer .sale-item-row').each(function(index, row) {
+                    $(row).find('select').attr('name', `Items[${index}].ProductId`);
+                    $(row).find('input[type="number"]').attr('name', `Items[${index}].Quantity`);
+                });
+            }
+
+            $('#addItemBtn').click(function () {
+                var newRow = `
+                    <div class="row sale-item-row mb-2">
+                        <div class="col-md-7">
+                             <label>Ürün</label>
+                            <select name="Items[${itemIndex}].ProductId" class="form-control product-select">
+                                <option value="">-- Ürün Seçin --</option>
+                                ${products.map(p => `<option value="${p.Id}">${p.Name}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label>Adet</label>
+                            <input type="number" name="Items[${itemIndex}].Quantity" class="form-control quantity-input" min="1" value="1"/>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="button" class="btn btn-danger remove-item-btn">Kaldır</button>
+                        </div>
+                    </div>`;
+                $('#saleItemsContainer').append(newRow);
+                itemIndex++;
+            });
+
+            $('#saleItemsContainer').on('click', '.remove-item-btn', function () {
+                $(this).closest('.sale-item-row').remove();
+                updateRowIndices();
+                itemIndex = $('#saleItemsContainer .sale-item-row').length;
+            });
+        });
+    </script>
+}

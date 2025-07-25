@@ -1,0 +1,54 @@
+﻿@model IEnumerable<CRMYonetimSistemi.Models.Sale>
+
+@{
+    ViewData["Title"] = "Satış Kayıtları";
+}
+
+<h1>Satış Kayıtları</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Yeni Satış Ekle</a>
+</p>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Customer)
+            </th>
+            <th>
+                Kalem Sayısı
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TotalAmount)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SaleDate)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Customer!.Name)
+                </td>
+                <td>
+                    @item.SaleItems.Count()
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TotalAmount)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SaleDate)
+                </td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">Detaylar</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm">Sil</a> |
+                    <a asp-controller="Proforma" asp-action="Generate" asp-route-id="@item.Id" class="btn btn-success btn-sm" target="_blank">Proforma</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
