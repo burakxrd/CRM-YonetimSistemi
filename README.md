@@ -118,11 +118,11 @@ Projeyi yerel makinenizde kurmak ve çalıştırmak için aşağıdaki adımlar�
 
 1.  **Projeyi Klonlayın veya İndirin:**
 
-    ```bash
+```bash
 
     git clone [https://github.com/KULLANICI_ADINIZ/CrmYonetimSistemi.git](https://github.com/KULLANICI_ADINIZ/CrmYonetimSistemi.git)
 
-    ```
+```
 
 2.  **Projeyi Visual Studio'da Açın:**
 
@@ -138,7 +138,7 @@ Projeyi yerel makinenizde kurmak ve çalıştırmak için aşağıdaki adımlar�
 
 
 
-    ```json
+```json
 
     "ConnectionStrings": {
 
@@ -146,7 +146,7 @@ Projeyi yerel makinenizde kurmak ve çalıştırmak için aşağıdaki adımlar�
 
     }
 
-    ```
+```
 
     * **`SUNUCU_ADINIZ`**: SQL Server sunucunuzun adıdır (Örn: `DESKTOP-ABC\SQLEXPRESS` veya `localhost`).
 
@@ -158,13 +158,13 @@ Projeyi yerel makinenizde kurmak ve çalıştırmak için aşağıdaki adımlar�
 
     * `superAdminPassword` değişkenine ilk admin kullanıcısı için güçlü bir şifre atayın.
 
-    ```csharp
+```csharp
 
     // LÜTFEN BU ŞİFREYİ GÜÇLÜ BİR ŞİFRE İLE DEĞİŞTİRİN!
 
     string superAdminPassword = "Password123!";
 
-    ```
+```
 
 
 
@@ -174,11 +174,11 @@ Projeyi yerel makinenizde kurmak ve çalıştırmak için aşağıdaki adımlar�
 
     * Açılan konsola aşağıdaki komutu yazarak veritabanını ve tabloları oluşturun:
 
-    ```powershell
+```powershell
 
     Update-Database
 
-    ```
+```
 
 
 
@@ -212,7 +212,7 @@ Projeyi yerel makinenizde kurmak ve çalıştırmak için aşağıdaki adımlar�
 
 
 
-    ```csharp
+ ```csharp
 
     // ESKİ HALİ:
 
@@ -224,7 +224,7 @@ Projeyi yerel makinenizde kurmak ve çalıştırmak için aşağıdaki adımlar�
 
     // await DbSeeder.SeedRolesAndSuperAdminAsync(services); // Bu satırı devre dışı bırakın ya da silin.
 
-    ```
+ ```
 
 Bu işlemi yaptıktan sonra uygulama her başladığında yeniden kullanıcı oluşturmaya çalışmaz ve kodunuzda gereksiz bir işlem kalmaz.
 
