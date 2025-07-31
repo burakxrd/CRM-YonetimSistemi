@@ -30,7 +30,6 @@
                                     <a class="nav-link text-danger fw-bold" asp-area="" asp-controller="Admin" asp-action="Index">Kullanıcı Yönetimi</a>
                                 </li>
                             }
-                            @* Kullanıcı giriş yapmışsa gösterilecek menü linkleri *@
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Dashboard" asp-action="Index">Kontrol Paneli</a>
                             </li>
@@ -52,7 +51,6 @@
                         }
                     </ul>
 
-                    @* Sağ tarafta yer alacak Login / Logout bölümü *@
                     <ul class="navbar-nav">
                         @if (SignInManager.IsSignedIn(User))
                         {

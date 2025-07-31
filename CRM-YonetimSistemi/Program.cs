@@ -15,7 +15,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 
-// IDENTITY SERVISI GÜNCELLEMESÝ
+
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 {
     options.User.RequireUniqueEmail = false;
@@ -46,7 +46,7 @@ builder.Services.AddRazorPages();
 
 var app = builder.Build();
 
-// SEEDER ÇAÐRISI | Uygulamayý kurarken sadece bir kez çalýþtýrýlýr. Daha sonra bu çaðrý yorum satýrýna alýnýr.
+// SEEDER ÇAÐRISI -- Bir kere çalýþtýrdýktan sonra yorum satýrýna alýn ya da silin
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;

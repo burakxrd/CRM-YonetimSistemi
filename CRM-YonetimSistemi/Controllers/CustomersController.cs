@@ -30,11 +30,9 @@ namespace CRMYonetimSistemi.Controllers
                 return NotFound();
             }
 
-            // Müşteriyi çekerken, ilişkili olduğu tüm satışları (Sales)
-            // ve her bir satışın satış kalemlerini (SaleItems) de veritabanından getiriyoruz.
             var customer = await _context.Customers
-                .Include(c => c.Sales) // Müşterinin satışlarını getir
-                    .ThenInclude(s => s.SaleItems) // Her satışın kalemlerini getir
+                .Include(c => c.Sales) 
+                    .ThenInclude(s => s.SaleItems) 
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (customer == null)
@@ -42,11 +40,10 @@ namespace CRMYonetimSistemi.Controllers
                 return NotFound();
             }
 
-            // ViewModel'i oluşturup dolduruyoruz.
             var viewModel = new CustomerProfileViewModel
             {
                 Customer = customer,
-                Sales = customer.Sales.OrderByDescending(s => s.SaleDate).ToList() // Satışları tarihe göre yeniden eskiye sırala
+                Sales = customer.Sales.OrderByDescending(s => s.SaleDate).ToList() 
             };
 
             return View(viewModel);

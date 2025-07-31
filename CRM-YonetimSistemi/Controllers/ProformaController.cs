@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using QuestPDF.Fluent;
 using CRMYonetimSistemi.Data;
 using CRMYonetimSistemi.Documents;
+using System.Threading.Tasks;
 
 namespace CRMYonetimSistemi.Controllers
 {
@@ -17,13 +18,13 @@ namespace CRMYonetimSistemi.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Generate(int id)
+        public async Task<IActionResult> Generate(int saleId)
         {
             var sale = await _context.Sales
                 .Include(s => s.Customer)
-                .Include(s => s.SaleItems) // Çok önemli! Satış kalemlerini de getiriyoruz.
-                    .ThenInclude(si => si.Product) // Kalemlerin içindeki ürünleri de getiriyoruz.
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .Include(s => s.SaleItems)
+                    .ThenInclude(si => si.Product)
+                .FirstOrDefaultAsync(m => m.Id == saleId); 
 
             if (sale == null)
             {

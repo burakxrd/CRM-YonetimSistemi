@@ -1,0 +1,228 @@
+﻿@model CRMYonetimSistemi.ViewModels.ProductPurchaseViewModel
+@using CRMYonetimSistemi.Models
+
+@{
+    ViewData["Title"] = Model.Id.HasValue ? "Alım Kaydını Düzenle" : "Yeni Ürün Al";
+}
+
+<h1>@ViewData["Title"]</h1>
+<h4>Alım Bilgilerini Girin</h4>
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="@(Model.Id.HasValue ? "EditPurchase" : "Purchase")" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <input type="hidden" asp-for="Id" />
+
+            <div class="form-group mb-3">
+                <label asp-for="ProductId" class="control-label"></label>
+                <select asp-for="ProductId" class="form-select" asp-items="@Model.Products">
+                    <option value="">-- Bir Ürün Seçin --</option>
+                </select>
+                <span asp-validation-for="ProductId" class="text-danger"></span>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label asp-for="QuantityInUnits" class="control-label"></label>
+                        <input asp-for="QuantityInUnits" class="form-control calculation-input" type="number" step="1" />
+                        <span asp-validation-for="QuantityInUnits" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label asp-for="TotalKg" class="control-label"></label>
+                        <input asp-for="TotalKg" class="form-control calculation-input" type="number" step="0.01" />
+                        <span asp-validation-for="TotalKg" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row align-items-center p-2 border rounded mb-3">
+                <div class="col-md-6">
+                    <label asp-for="ProductPricePerUnit" class="control-label"></label>
+                    <input asp-for="ProductPricePerUnit" class="form-control calculation-input" type="number" step="0.01" />
+                    <span asp-validation-for="ProductPricePerUnit" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="ProductCurrency" class="control-label"></label>
+                    <div class="mt-2">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input currency-radio" type="radio" asp-for="ProductCurrency" value="@CurrencyType.USD" id="productCurrencyUsd" />
+                            <label class="form-check-label" for="productCurrencyUsd">Dolar ($)</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input currency-radio" type="radio" asp-for="ProductCurrency" value="@CurrencyType.TRY" id="productCurrencyTry" />
+                            <label class="form-check-label" for="productCurrencyTry">TL (₺)</label>
+                        </div>
+                    </div>
+                    <span asp-validation-for="ProductCurrency" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row align-items-center p-2 border rounded mb-3">
+                <div class="col-md-6">
+                    <label asp-for="ShippingCostPerKg" class="control-label"></label>
+                    <input asp-for="ShippingCostPerKg" class="form-control calculation-input" type="number" step="0.01" />
+                    <span asp-validation-for="ShippingCostPerKg" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="ShippingCurrency" class="control-label"></label>
+                    <div class="mt-2">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input currency-radio" type="radio" asp-for="ShippingCurrency" value="@CurrencyType.USD" id="shippingCurrencyUsd" />
+                            <label class="form-check-label" for="shippingCurrencyUsd">Dolar ($)</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input currency-radio" type="radio" asp-for="ShippingCurrency" value="@CurrencyType.TRY" id="shippingCurrencyTry" />
+                            <label class="form-check-label" for="shippingCurrencyTry">TL (₺)</label>
+                        </div>
+                    </div>
+                    <span asp-validation-for="ShippingCurrency" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-group mb-3" id="exchangeRateGroup">
+                <label asp-for="ExchangeRate" class="control-label"></label>
+                <input asp-for="ExchangeRate" class="form-control calculation-input" type="number" step="0.0001" />
+                <span asp-validation-for="ExchangeRate" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mt-4">
+                <input type="submit" value="@(Model.Id.HasValue ? "Değişiklikleri Kaydet" : "Alımı Kaydet")" class="btn btn-success" />
+                <a asp-action="PurchaseHistory" class="btn btn-secondary">İptal</a>
+            </div>
+        </form>
+    </div>
+
+    @* Sağ taraf, canlı hesaplamalar için *@
+    <div class="col-md-6">
+        <div class="card bg-light p-3">
+            <h5 class="card-title">Anlık Maliyet Hesaplamaları</h5>
+            <hr />
+
+            <div class="mb-3">
+                <strong>Toplam Kargo Ücreti (Kendi Para Biriminde):</strong><br />
+                <small>Formül: Kargo Ücreti (Kg Başına) * Toplam Kargo Ağırlığı (Kg)</small><br />
+                <span id="displayTotalShippingCostOperation"></span><br />
+                <strong id="displayTotalShippingCostResult"></strong><span id="displayShippingCurrencySymbolCost"></span>
+            </div>
+
+            <div class="mb-3">
+                <strong>Toplam Kargo Ücreti (TL):</strong><br />
+                <small>Formül: Toplam Kargo Ücreti (Kendi Para Biriminde) * Döviz Kuru</small><br />
+                <span id="displayTotalShippingCostTRYOperation"></span><br />
+                <strong id="displayTotalShippingCostTRYResult"></strong> TL
+            </div>
+
+            <div class="mb-3">
+                <strong>Ürün Başına Kargo Ücreti (TL):</strong><br />
+                <small>Formül: Toplam Kargo Ücreti (TL) / Ürün Miktarı (Adet)</small><br />
+                <span id="displayShippingCostPerUnitTRYOperation"></span><br />
+                <strong id="displayShippingCostPerUnitTRYResult"></strong> TL
+            </div>
+
+            <hr />
+
+            <div class="mb-3">
+                <strong>Toplam Ürün Fiyatı (Kendi Para Biriminde):</strong><br />
+                <small>Formül: Ürün Birim Fiyatı * Ürün Miktarı (Adet)</small><br />
+                <span id="displayTotalProductPriceOperation"></span><br />
+                <strong id="displayTotalProductPriceResult"></strong><span id="displayProductCurrencySymbolPrice"></span>
+            </div>
+
+            <div class="mb-3">
+                <strong>Toplam Ürün Fiyatı (TL):</strong><br />
+                <small>Formül: Toplam Ürün Fiyatı (Kendi Para Biriminde) * Döviz Kuru</small><br />
+                <span id="displayTotalProductPriceTRYOperation"></span><br />
+                <strong id="displayTotalProductPriceTRYResult"></strong> TL
+            </div>
+
+            <hr />
+
+            <div class="mb-2">
+                <strong>Genel Toplam Maliyet (TL):</strong><br />
+                <small>Formül: Toplam Ürün Fiyatı (TL) + Toplam Kargo Ücreti (TL)</small><br />
+                <span id="displayGrandTotalCostTRYOperation"></span><br />
+                <strong id="displayGrandTotalCostTRYResult"></strong> TL
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(document).ready(function () {
+            // Canlı hesaplamaları tetikleyecek inputlar ve radyo butonları için event dinleyiciler
+            $('.calculation-input, .currency-radio').on('input change', calculateAndDisplayCosts);
+
+            // Sayfa yüklendiğinde ve input değerleri değiştiğinde çalışacak fonksiyon
+            function calculateAndDisplayCosts() {
+                var quantity = parseFloat($('#QuantityInUnits').val()) || 0;
+                var productPricePerUnit = parseFloat($('#ProductPricePerUnit').val()) || 0;
+                var totalKg = parseFloat($('#TotalKg').val()) || 0;
+                var shippingCostPerKg = parseFloat($('#ShippingCostPerKg').val()) || 0;
+
+                // Döviz kuru girişi artık gizlenmiyor, sadece değeri alıyoruz.
+                // Eğer girilmediyse veya 0'dan küçükse 1 olarak kabul et (hesaplamalar için)
+                var exchangeRateInputVal = parseFloat($('#ExchangeRate').val());
+                var exchangeRate = isNaN(exchangeRateInputVal) || exchangeRateInputVal <= 0 ? 1 : exchangeRateInputVal;
+
+                // Para birimi tiplerini al
+                var productCurrencyValue = $('input[name="ProductCurrency"]:checked').val();
+                var shippingCurrencyValue = $('input[name="ShippingCurrency"]:checked').val();
+
+                var productCurrencySymbol = productCurrencyValue == "@((int)CurrencyType.USD)" ? "$" : "₺";
+                var shippingCurrencySymbol = shippingCurrencyValue == "@((int)CurrencyType.USD)" ? "$" : "₺";
+
+                // --- Hesaplamalar ve Görüntüleme ---
+
+                // 1. Toplam Kargo Ücreti (Kendi Para Biriminde)
+                var totalShippingCost = totalKg * shippingCostPerKg;
+                $('#displayTotalShippingCostOperation').text(`${totalKg.toFixed(2)} (Kg) * ${shippingCostPerKg.toFixed(2)} (Kg Başına)`);
+                $('#displayTotalShippingCostResult').text(totalShippingCost.toFixed(2));
+                $('#displayShippingCurrencySymbolCost').text(shippingCurrencySymbol);
+
+                // 2. Toplam Kargo Ücreti (TL)
+                // Eğer kargo para birimi TL ise döviz kuru 1 olarak kabul edilir
+                var actualShippingExchangeRate = (shippingCurrencyValue == "@((int)CurrencyType.TRY)") ? 1 : exchangeRate;
+                var totalShippingCostTRY = totalShippingCost * actualShippingExchangeRate;
+                $('#displayTotalShippingCostTRYOperation').text(`${totalShippingCost.toFixed(2)} ${shippingCurrencySymbol} * ${actualShippingExchangeRate.toFixed(4)} (Döviz Kuru)`);
+                $('#displayTotalShippingCostTRYResult').text(totalShippingCostTRY.toFixed(2));
+
+                // 3. Ürün Başına Kargo Ücreti (TL)
+                var shippingCostPerUnitTRY = (quantity > 0) ? totalShippingCostTRY / quantity : 0;
+                $('#displayShippingCostPerUnitTRYOperation').text(`${totalShippingCostTRY.toFixed(2)} TL / ${quantity.toFixed(0)} (Adet)`);
+                $('#displayShippingCostPerUnitTRYResult').text(shippingCostPerUnitTRY.toFixed(2));
+
+                // 4. Toplam Ürün Fiyatı (Kendi Para Biriminde)
+                var totalProductPrice = productPricePerUnit * quantity;
+                $('#displayTotalProductPriceOperation').text(`${productPricePerUnit.toFixed(2)} (Birim Fiyat) * ${quantity.toFixed(0)} (Adet)`);
+                $('#displayTotalProductPriceResult').text(totalProductPrice.toFixed(2));
+                $('#displayProductCurrencySymbolPrice').text(productCurrencySymbol);
+
+                // 5. Toplam Ürün Fiyatı (TL)
+                // Eğer ürün para birimi TL ise döviz kuru 1 olarak kabul edilir
+                var actualProductExchangeRate = (productCurrencyValue == "@((int)CurrencyType.TRY)") ? 1 : exchangeRate;
+                var totalProductPriceTRY = totalProductPrice * actualProductExchangeRate;
+                $('#displayTotalProductPriceTRYOperation').text(`${totalProductPrice.toFixed(2)} ${productCurrencySymbol} * ${actualProductExchangeRate.toFixed(4)} (Döviz Kuru)`);
+                $('#displayTotalProductPriceTRYResult').text(totalProductPriceTRY.toFixed(2));
+
+                // 6. Genel Toplam Maliyet (TL)
+                var grandTotalCostTRY = totalProductPriceTRY + totalShippingCostTRY;
+                $('#displayGrandTotalCostTRYOperation').text(`${totalProductPriceTRY.toFixed(2)} TL + ${totalShippingCostTRY.toFixed(2)} TL`);
+                $('#displayGrandTotalCostTRYResult').text(grandTotalCostTRY.toFixed(2));
+            }
+
+            // Sayfa ilk yüklendiğinde hesaplamayı çalıştır
+            calculateAndDisplayCosts();
+        });
+    </script>
+}

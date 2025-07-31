@@ -17,8 +17,6 @@ namespace CRMYonetimSistemi.Models
         [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy}")]
         public DateTime CreatedAt { get; set; }
 
-        // Bu, bir müşterinin birden çok satışı olabileceğini belirtir.
-        // Bu satır, .Include(c => c.Sales) sorgusunun çalışmasını sağlar.
         public virtual ICollection<Sale> Sales { get; set; } = new List<Sale>();
     }
 }

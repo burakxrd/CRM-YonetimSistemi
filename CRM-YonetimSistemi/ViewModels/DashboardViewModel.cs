@@ -12,14 +12,12 @@ namespace CRMYonetimSistemi.ViewModels
         public decimal RemainingReceivables { get; set; }
         public decimal CurrentBalance { get; set; }
 
-        // Listeleri boş olarak başlatarak null olma ihtimalini ortadan kaldırıyoruz.
         public List<Product> LowStockProducts { get; set; } = new List<Product>();
         public List<TopCustomerViewModel> TopCustomers { get; set; } = new List<TopCustomerViewModel>();
     }
 
     public class TopCustomerViewModel
     {
-        // Bu özelliği de null olamayacak şekilde başlatıyoruz.
         public string CustomerName { get; set; } = string.Empty;
         public decimal TotalAmount { get; set; }
     }

@@ -1,8 +1,9 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using CRMYonetimSistemi.Models;
-using CRMYonetimSistemi.ViewModels; 
+using CRMYonetimSistemi.ViewModels;
 
 namespace CRMYonetimSistemi.Controllers
 {
@@ -19,12 +20,10 @@ namespace CRMYonetimSistemi.Controllers
 
         public IActionResult Index()
         {
-            // Eðer kullanýcý zaten giriþ yapmýþsa, onu direkt kontrol paneline yönlendir.
             if (_signInManager.IsSignedIn(User))
             {
                 return RedirectToAction("Index", "Dashboard");
             }
-            // Deðilse, giriþ sayfasýna yönlendir.
             return RedirectToAction(nameof(Login));
         }
 
@@ -40,7 +39,6 @@ namespace CRMYonetimSistemi.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Giriþ iþlemi model.Email yerine model.UserName kullanýlarak yapýlýyor.
                 var result = await _signInManager.PasswordSignInAsync(model.UserName!, model.Password!, model.RememberMe, lockoutOnFailure: false);
 
                 if (result.Succeeded)
@@ -60,7 +58,6 @@ namespace CRMYonetimSistemi.Controllers
                 }
             }
 
-            // Model geçerli deðilse, formu hatalarla birlikte tekrar göster.
             return View(model);
         }
 

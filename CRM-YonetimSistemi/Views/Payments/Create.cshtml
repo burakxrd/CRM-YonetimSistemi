@@ -15,7 +15,6 @@
 
             <div class="form-group mb-3">
                 <label asp-for="CustomerId" class="control-label">Müşteri</label>
-                @* Controller'dan gelen ViewData["CustomerId"] ile dropdown'ı doldurur *@
                 <select asp-for="CustomerId" class="form-control" asp-items="ViewBag.CustomerId">
                     <option value="">-- Müşteri Seçin --</option>
                 </select>

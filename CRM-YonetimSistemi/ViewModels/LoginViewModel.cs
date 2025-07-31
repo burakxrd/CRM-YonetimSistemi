@@ -6,7 +6,7 @@ namespace CRMYonetimSistemi.ViewModels
     {
         [Required(ErrorMessage = "Kullanıcı adı alanı zorunludur.")]
         [Display(Name = "Kullanıcı Adı")]
-        public string? UserName { get; set; } // 'Email' alanı 'UserName' olarak değiştirildi.
+        public string? UserName { get; set; } 
 
         [Required(ErrorMessage = "Şifre alanı zorunludur.")]
         [DataType(DataType.Password)]

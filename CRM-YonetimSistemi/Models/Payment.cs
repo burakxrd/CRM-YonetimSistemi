@@ -19,7 +19,7 @@ namespace CRMYonetimSistemi.Models
         public decimal Amount { get; set; }
 
         [Display(Name = "Açıklama")]
-        public string? Description { get; set; } // '?' opsiyonel (nullable) olmasını sağlar.
+        public string? Description { get; set; } 
 
         [Display(Name = "Ödeme Tarihi")]
         [DataType(DataType.Date)]

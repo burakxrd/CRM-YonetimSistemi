@@ -87,7 +87,7 @@ namespace CRMYonetimSistemi.Controllers
             var model = new EditUserViewModel
             {
                 UserId = user.Id,
-                UserName = user.UserName,
+                UserName = user.UserName, // Null kontrolü yapıldığı için güvenli.
                 Roles = new List<RoleViewModel>()
             };
 

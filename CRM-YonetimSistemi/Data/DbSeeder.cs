@@ -13,7 +13,6 @@ namespace CRMYonetimSistemi.Data
             // Gerekli servisleri al
             var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
             var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
-
             var logger = services.GetRequiredService<ILogger<Program>>();
 
             logger.LogInformation("Rol ve süper admin tohumlama işlemi başlıyor.");
@@ -30,7 +29,7 @@ namespace CRMYonetimSistemi.Data
             }
 
             // Süper admin kullanıcısını sadece bir kez oluştur
-            var superAdminUserName = "KullanıcıAdınıBurayaGirin";
+            var superAdminUserName = "KullanıcıAdınıBuradaBelirleyin";
             var superAdmin = await userManager.FindByNameAsync(superAdminUserName);
 
             if (superAdmin == null)
@@ -41,7 +40,7 @@ namespace CRMYonetimSistemi.Data
                 };
 
                 // LÜTFEN BU ŞİFREYİ İLK GİRİŞTEN SONRA DEĞİŞTİRİN!
-                string superAdminPassword = "ŞifreyiBurayaGirin";
+                string superAdminPassword = "ŞifreyiBuradaBelirleyin";
                 var createResult = await userManager.CreateAsync(superAdmin, superAdminPassword);
 
                 if (createResult.Succeeded)

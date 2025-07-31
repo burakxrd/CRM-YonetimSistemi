@@ -1,21 +1,14 @@
 ﻿@model CRMYonetimSistemi.ViewModels.EditSaleViewModel
+@using CRMYonetimSistemi.Models
 
 @{
     ViewData["Title"] = "Satış Kaydını Düzenle";
-    var productsJson = Json.Serialize(Model.AvailableProducts.Select(p => new { p.Id, p.Name, p.EffectiveSellingPrice, p.Stock }));
 }
 
-<h1>Satış Kaydını Düzenle</h1>
+<h1>@ViewData["Title"]</h1>
 <hr />
 
-<div id="page-data-holder"
-     data-products='@productsJson'
-     data-item-count="@Model.Items.Count"
-     style="display: none;">
-</div>
-
-
-<form asp-action="Edit">
+<form asp-action="Edit" method="post">
     <div asp-validation-summary="All" class="text-danger"></div>
     <input type="hidden" asp-for="Id" />
 
@@ -23,7 +16,7 @@
         <div class="col-md-6">
             <div class="form-group mb-3">
                 <label asp-for="CustomerId" class="control-label"></label>
-                <select asp-for="CustomerId" class="form-control" asp-items="@(new SelectList(Model.AvailableCustomers, "Id", "Name"))"></select>
+                <select asp-for="CustomerId" class="form-select" asp-items="@(new SelectList(Model.AvailableCustomers, "Id", "Name"))"></select>
                 <span asp-validation-for="CustomerId" class="text-danger"></span>
             </div>
         </div>
@@ -36,36 +29,59 @@
         </div>
     </div>
 
+    <div class="row align-items-end">
+        <div class="col-md-6">
+            <div class="form-group mb-3">
+                <label asp-for="Currency" class="control-label"></label>
+                <div class="mt-2">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input currency-radio" type="radio" asp-for="Currency" value="@CurrencyType.TRY" id="currencyTry" />
+                        <label class="form-check-label" for="currencyTry">TL (₺)</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input currency-radio" type="radio" asp-for="Currency" value="@CurrencyType.USD" id="currencyUsd" />
+                        <label class="form-check-label" for="currencyUsd">Dolar ($)</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group mb-3" id="exchangeRateGroup" style="display: none;">
+                <label asp-for="ExchangeRate" class="control-label"></label>
+                <input asp-for="ExchangeRate" class="form-control" type="number" step="0.0001" />
+                <span asp-validation-for="ExchangeRate" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+
     <h4 class="mt-4">Satılan Ürünler</h4>
     <div id="saleItemsContainer">
         @for (int i = 0; i < Model.Items.Count; i++)
         {
-            <div class="row sale-item-row mb-2">
-                <div class="col-md-7">
-                    <label>Ürün</label>
-                    <select name="Items[@i].ProductId" class="form-control product-select">
-                        @foreach (var product in Model.AvailableProducts)
-                        {
-                            <option value="@product.Id" selected="@(product.Id == Model.Items[i].ProductId)">@product.Name</option>
-                        }
-                    </select>
+            <div class="row sale-item-row align-items-end mb-2 p-2 border rounded">
+                <input type="hidden" name="Items[@i].ProductId" value="@Model.Items[i].ProductId" />
+
+                <div class="col-md-5">
+                    <label class="form-label small">Ürün</label>
+                    <input type="text" class="form-control" value="@Model.AvailableProducts.FirstOrDefault(p => p.Id == Model.Items[i].ProductId)?.Name" readonly />
                 </div>
                 <div class="col-md-3">
-                    <label>Adet</label>
-                    <input type="number" name="Items[@i].Quantity" value="@Model.Items[i].Quantity" class="form-control quantity-input" min="1" />
+                    <label class="form-label small">Miktar (Adet)</label>
+                    <input type="number" name="Items[@i].Quantity" value="@Model.Items[i].Quantity" class="form-control quantity-input" min="1" step="1" required />
                 </div>
-                <div class="col-md-2 d-flex align-items-end">
-                    <button type="button" class="btn btn-danger remove-item-btn">Kaldır</button>
+                <div class="col-md-2">
+                    <label class="form-label small unit-price-label">Birim Fiyat</label>
+                    <input type="number" name="Items[@i].UnitPrice" value="@Model.Items[i].UnitPrice" class="form-control unit-price-input" min="0.01" step="0.01" placeholder="Fiyat" required />
+                </div>
+                <div class="col-md-2">
                 </div>
             </div>
         }
     </div>
 
-    <button type="button" id="addItemBtn" class="btn btn-success mt-2">Yeni Ürün Ekle</button>
-
-    <div class="form-group mt-4">
+    <div class="form-group mt-4 border-top pt-3">
         <input type="submit" value="Değişiklikleri Kaydet" class="btn btn-primary" />
-        <a asp-action="Index" class="btn btn-secondary">Listeye Geri Dön</a>
+        <a asp-action="Index" class="btn btn-secondary">İptal</a>
     </div>
 </form>
 
@@ -73,43 +89,25 @@
     <partial name="_ValidationScriptsPartial" />
     <script>
         $(document).ready(function () {
-            const dataHolder = $('#page-data-holder');
-            const products = dataHolder.data('products');
-            let itemIndex = dataHolder.data('item-count');
-
-            function updateRowIndices() {
-                $('#saleItemsContainer .sale-item-row').each(function(index, row) {
-                    $(row).find('select').attr('name', `Items[${index}].ProductId`);
-                    $(row).find('input[type="number"]').attr('name', `Items[${index}].Quantity`);
-                });
+            function toggleExchangeRateField() {
+                if ($('#currencyUsd').is(':checked')) {
+                    $('#exchangeRateGroup').show();
+                    $('.unit-price-label').text('Birim Fiyat ($)');
+                } else {
+                    $('#exchangeRateGroup').hide();
+                    $('.unit-price-label').text('Birim Fiyat (₺)');
+                }
             }
 
-            $('#addItemBtn').click(function () {
-                var newRow = `
-                    <div class="row sale-item-row mb-2">
-                        <div class="col-md-7">
-                             <label>Ürün</label>
-                            <select name="Items[${itemIndex}].ProductId" class="form-control product-select">
-                                <option value="">-- Ürün Seçin --</option>
-                                ${products.map(p => `<option value="${p.Id}">${p.Name}</option>`).join('')}
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label>Adet</label>
-                            <input type="number" name="Items[${itemIndex}].Quantity" class="form-control quantity-input" min="1" value="1"/>
-                        </div>
-                        <div class="col-md-2 d-flex align-items-end">
-                            <button type="button" class="btn btn-danger remove-item-btn">Kaldır</button>
-                        </div>
-                    </div>`;
-                $('#saleItemsContainer').append(newRow);
-                itemIndex++;
-            });
+            // Sayfa ilk yüklendiğinde durumu kontrol et
+            toggleExchangeRateField();
 
-            $('#saleItemsContainer').on('click', '.remove-item-btn', function () {
-                $(this).closest('.sale-item-row').remove();
-                updateRowIndices();
-                itemIndex = $('#saleItemsContainer .sale-item-row').length;
+            // Para birimi radio butonu değiştiğinde fonksiyonu çalıştır
+            $('.currency-radio').change(function () {
+                if ($('#currencyTry').is(':checked')) {
+                    $('#ExchangeRate').val(''); // TL'ye geçilirse kuru temizle
+                }
+                toggleExchangeRateField();
             });
         });
     </script>

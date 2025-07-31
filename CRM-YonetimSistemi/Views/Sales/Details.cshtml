@@ -1,61 +1,80 @@
 ﻿@model CRMYonetimSistemi.Models.Sale
+@using CRMYonetimSistemi.Models
 
 @{
     ViewData["Title"] = "Satış Detayları";
+    bool isUsdSale = Model.Currency == CurrencyType.USD && Model.ExchangeRate.HasValue;
 }
 
-<h1>Satış Detayları</h1>
+<h1>@ViewData["Title"]</h1>
 
 <div>
-    <h4>Satış Bilgileri</h4>
+    <h4>Satış ID: @Model.Id</h4>
     <hr />
     <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Customer)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Customer!.Name)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.SaleDate)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.SaleDate)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.TotalAmount)
-        </dt>
-        <dd class="col-sm-10">
-            @Model.TotalAmount.ToString("C")
-        </dd>
+        <dt class="col-sm-2">Müşteri</dt>
+        <dd class="col-sm-10">@Model.Customer!.Name</dd>
+
+        <dt class="col-sm-2">Satış Tarihi</dt>
+        <dd class="col-sm-10">@Model.SaleDate.ToString("dd.MM.yyyy")</dd>
     </dl>
 </div>
 
 <h4 class="mt-4">Satılan Ürünler</h4>
-<table class="table">
-    <thead>
+<table class="table table-bordered">
+    <thead class="table-light">
         <tr>
-            <th>Ürün Adı</th>
-            <th>Adet</th>
+            <th>Ürün</th>
+            <th>Miktar</th>
             <th>Birim Fiyat</th>
-            <th>Satır Toplamı</th>
+            @if (isUsdSale)
+            {
+                <th>Kur</th>
+                <th>Birim Fiyat (₺)</th>
+            }
+            <th>Toplam Tutar (₺)</th>
         </tr>
     </thead>
     <tbody>
         @foreach (var item in Model.SaleItems)
         {
             <tr>
-                <td>@item.Product!.Name</td>
-                <td>@item.Quantity</td>
-                <td>@item.UnitPrice.ToString("C")</td>
-                <td>@((item.Quantity * item.UnitPrice).ToString("C"))</td>
+                <td>@item.Product.Name</td>
+                <td>@item.Quantity Adet</td>
+
+                @if (isUsdSale)
+                {
+                    // Dolar satışı için detaylı gösterim
+                    <td>@item.UnitPrice.ToString("N2") </td>
+                    <td>@Model.ExchangeRate!.Value.ToString("N4")</td>
+                    <td>@((item.UnitPrice * Model.ExchangeRate.Value).ToString("C2"))</td>
+                    <td>@((item.Quantity * item.UnitPrice * Model.ExchangeRate.Value).ToString("C2"))</td>
+                }
+                else
+                {
+                    // TL satışı için sade gösterim
+                    <td>@item.UnitPrice.ToString("C2")</td>
+                    <td>@((item.Quantity * item.UnitPrice).ToString("C2"))</td>
+                }
             </tr>
         }
     </tbody>
 </table>
 
-
-<div>
-    <a asp-action="Index" class="btn btn-secondary">Listeye Geri Dön</a>
+<div class="row justify-content-end mt-3">
+    <div class="col-md-4">
+        <table class="table">
+            <tbody>
+                <tr class="table-active">
+                    <th><strong>Genel Toplam</strong></th>
+                    <td class="text-end"><strong>@Model.TotalAmountInTRY.ToString("C2")</strong></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 
+<div class="mt-4">
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Düzenle</a>
+    <a asp-action="Index" class="btn btn-secondary">Listeye Geri Dön</a>
+</div>

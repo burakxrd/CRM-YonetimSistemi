@@ -20,38 +20,34 @@ namespace CRMYonetimSistemi.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var sales = await _context.Sales
-                .Include(s => s.SaleItems)
-                    .ThenInclude(si => si.Product)
-                .Include(s => s.Customer)
-                .ToListAsync();
-
+            var sales = await _context.Sales.Include(s => s.Customer).ToListAsync();
             var expenses = await _context.Expenses.ToListAsync();
             var customers = await _context.Customers.ToListAsync();
             var payments = await _context.Payments.ToListAsync();
+            var purchaseHistories = await _context.ProductPurchaseHistories.ToListAsync();
 
-            decimal totalRevenue = sales.Sum(s => s.TotalAmount);
+
+            decimal totalRevenue = sales.Sum(s => s.TotalAmountInTRY);
+
             decimal totalExpenses = expenses.Sum(e => e.Amount);
             int totalCustomers = customers.Count();
 
-            decimal costOfGoodsSold = sales.SelectMany(s => s.SaleItems)
-                                            .Where(si => si.Product != null)
-                                            .Sum(si => si.Product!.CalculatedCost * si.Quantity);
+            decimal netProfit = totalRevenue - totalExpenses;
 
-            decimal netProfit = totalRevenue - totalExpenses - costOfGoodsSold;
             decimal currentBalance = totalRevenue - totalExpenses;
 
             var customerSales = sales.GroupBy(s => s.CustomerId)
-                                     .ToDictionary(g => g.Key, g => g.Sum(s => s.TotalAmount));
+                                     .ToDictionary(g => g.Key, g => g.Sum(s => s.TotalAmountInTRY));
+
             var customerPayments = payments.GroupBy(p => p.CustomerId)
                                            .ToDictionary(g => g.Key, g => g.Sum(p => p.Amount));
 
             decimal remainingReceivables = 0;
             foreach (var customer in customers)
             {
-                customerSales.TryGetValue(customer.Id, out decimal totalSale);
+                customerSales.TryGetValue(customer.Id, out decimal totalSaleInTRY);
                 customerPayments.TryGetValue(customer.Id, out decimal totalPayment);
-                decimal balance = totalSale - totalPayment;
+                decimal balance = totalSaleInTRY - totalPayment;
                 if (balance > 0)
                 {
                     remainingReceivables += balance;
@@ -64,7 +60,7 @@ namespace CRMYonetimSistemi.Controllers
                 .Select(g => new TopCustomerViewModel
                 {
                     CustomerName = g.Key!.Name ?? "İsimsiz Müşteri",
-                    TotalAmount = g.Sum(s => s.TotalAmount)
+                    TotalAmount = g.Sum(s => s.TotalAmountInTRY)
                 })
                 .OrderByDescending(c => c.TotalAmount)
                 .Take(5)
@@ -91,4 +87,3 @@ namespace CRMYonetimSistemi.Controllers
         }
     }
 }
-

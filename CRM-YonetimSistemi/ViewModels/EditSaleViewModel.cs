@@ -1,29 +1,38 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
-using CRMYonetimSistemi.Models;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using CRMYonetimSistemi.Models;
 
 namespace CRMYonetimSistemi.ViewModels
 {
-    // Bu yeni ViewModel, hem mevcut satış bilgilerini hem de
-    // formdaki dinamik ürün listesini tutar.
     public class EditSaleViewModel
     {
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "Müşteri seçimi zorunludur.")]
         [Display(Name = "Müşteri")]
+        [Required(ErrorMessage = "Lütfen bir müşteri seçin.")]
         public int CustomerId { get; set; }
 
-        [Required(ErrorMessage = "Satış tarihi zorunludur.")]
         [Display(Name = "Satış Tarihi")]
+        [DataType(DataType.Date)]
         public DateTime SaleDate { get; set; }
 
-        // Formdan gelen ürün listesi
-        public List<SaleItemViewModel> Items { get; set; } = new List<SaleItemViewModel>();
+        [Display(Name = "Para Birimi")]
+        public CurrencyType Currency { get; set; }
 
-        // Dropdown listeleri için
-        public IEnumerable<Product> AvailableProducts { get; set; } = new List<Product>();
-        public IEnumerable<Customer> AvailableCustomers { get; set; } = new List<Customer>();
+        [Display(Name = "Döviz Kuru (USD/TRY)")]
+        public decimal? ExchangeRate { get; set; }
+
+        public List<SaleItemViewModel> Items { get; set; }
+
+        public IEnumerable<Product> AvailableProducts { get; set; }
+        public IEnumerable<Customer> AvailableCustomers { get; set; }
+
+        public EditSaleViewModel()
+        {
+            Items = new List<SaleItemViewModel>();
+            AvailableProducts = new List<Product>();
+            AvailableCustomers = new List<Customer>();
+        }
     }
 }

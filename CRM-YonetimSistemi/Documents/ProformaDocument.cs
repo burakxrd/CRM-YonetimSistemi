@@ -35,8 +35,8 @@ namespace CRMYonetimSistemi.Documents
             container.Row(row =>
             {
                 row.RelativeItem().Column(column =>
-                {                       //Bu kısma kendi işletmenizin adını ekleyebilirsiniz.
-                    column.Item().Text("Örnekİsim Imports").SemiBold().FontSize(24);
+                {
+                    column.Item().Text("CRMYonetimSistemi Imports").SemiBold().FontSize(24);
                 });
                 row.ConstantItem(150).AlignRight().Text("PROFORMA").Style(titleStyle);
             });
@@ -78,13 +78,15 @@ namespace CRMYonetimSistemi.Documents
                 // Fatura Kalemleri Tablosu
                 column.Item().Element(ComposeTable);
 
-                // Toplamlar Bölümü
+                // Kur Bilgisi ve Toplamlar Bölümü
                 column.Item().AlignRight().Element(ComposeTotals);
             });
         }
 
         void ComposeTable(IContainer container)
         {
+            var currencySymbol = _sale.Currency == CurrencyType.USD ? "$" : "₺";
+
             container.Table(table =>
             {
                 table.ColumnsDefinition(columns =>
@@ -99,11 +101,10 @@ namespace CRMYonetimSistemi.Documents
                 {
                     header.Cell().Background(Colors.Grey.Lighten3).Padding(5).Text("ÜRÜN ADI").SemiBold();
                     header.Cell().Background(Colors.Grey.Lighten3).Padding(5).AlignRight().Text("ADET").SemiBold();
-                    header.Cell().Background(Colors.Grey.Lighten3).Padding(5).AlignRight().Text("BİRİM FİYAT (₺)").SemiBold();
-                    header.Cell().Background(Colors.Grey.Lighten3).Padding(5).AlignRight().Text("TOPLAM TUTAR (₺)").SemiBold();
+                    header.Cell().Background(Colors.Grey.Lighten3).Padding(5).AlignRight().Text($"BİRİM FİYAT ({currencySymbol})").SemiBold();
+                    header.Cell().Background(Colors.Grey.Lighten3).Padding(5).AlignRight().Text($"TOPLAM TUTAR ({currencySymbol})").SemiBold();
                 });
 
-                // Artık bir liste üzerinden dönüyoruz
                 foreach (var item in _sale.SaleItems)
                 {
                     table.Cell().BorderBottom(1).BorderColor(Colors.Grey.Lighten2).Padding(5).Text(item.Product!.Name);
@@ -116,20 +117,39 @@ namespace CRMYonetimSistemi.Documents
 
         void ComposeTotals(IContainer container)
         {
-            container.Width(200).Column(column =>
+            var currencySymbol = _sale.Currency == CurrencyType.USD ? "$" : "₺";
+
+            container.Width(250).Column(column => 
             {
-                // Toplamlar, KDV vs. aynı kalabilir.
+                if (_sale.Currency == CurrencyType.USD && _sale.ExchangeRate.HasValue)
+                {
+                    column.Item().PaddingBottom(5).Row(row =>
+                    {
+                        row.RelativeItem().Text("İşlem Kuru:").Italic();
+                        row.RelativeItem().AlignRight().Text($"1 USD = {_sale.ExchangeRate.Value:N4} TL").Italic();
+                    });
+                }
+
                 column.Item().BorderTop(1).BorderColor(Colors.Grey.Lighten2).PaddingVertical(5).Row(row =>
                 {
                     row.RelativeItem().Text("ARA TOPLAM");
-                    row.RelativeItem().AlignRight().Text($"{_sale.TotalAmount:N2} ₺");
+                    row.RelativeItem().AlignRight().Text($"{_sale.TotalAmount:N2} {currencySymbol}");
                 });
 
                 column.Item().BorderTop(1).BorderColor(Colors.Grey.Lighten2).Background(Colors.Grey.Lighten3).Padding(5).Row(row =>
                 {
                     row.RelativeItem().Text("GENEL TOPLAM").Bold();
-                    row.RelativeItem().AlignRight().Text($"{_sale.TotalAmount:N2} ₺").Bold();
+                    row.RelativeItem().AlignRight().Text($"{_sale.TotalAmount:N2} {currencySymbol}").Bold();
                 });
+
+                 if (_sale.Currency == CurrencyType.USD)
+                {
+                    column.Item().BorderTop(1).BorderColor(Colors.Grey.Lighten2).PaddingVertical(5).Row(row =>
+                    {
+                        row.RelativeItem().Text("GENEL TOPLAM (TL)").Bold();
+                        row.RelativeItem().AlignRight().Text($"{_sale.TotalAmountInTRY:N2} ₺").Bold();
+                    });
+                }
             });
         }
 
@@ -146,14 +166,14 @@ namespace CRMYonetimSistemi.Documents
                 column.Item().Row(row =>
                 {
                     row.RelativeItem().Column(contactColumn =>
-                    {                                           // Dilerseniz iletişim kurulacak kişi ekleyebilirsiniz 
-                        contactColumn.Item().AlignCenter().Text("Örnekİsim").FontSize(10);
+                    {
+                        contactColumn.Item().AlignCenter().Text("Test1").FontSize(10);
                         contactColumn.Item().AlignCenter().Text("Tel/WhatsApp: +90 123 456 78 90").FontSize(10);
                     });
 
                     row.RelativeItem().Column(contactColumn =>
-                    {                                           // Dilerseniz iletişim kurulacak kişi ekleyebilirsiniz 
-                        contactColumn.Item().AlignCenter().Text("Örnek İsim").FontSize(10);
+                    {
+                        contactColumn.Item().AlignCenter().Text("Test2").FontSize(10);
                         contactColumn.Item().AlignCenter().Text("Tel/WhatsApp: +90 123 456 78 90").FontSize(10);
                     });
                 });

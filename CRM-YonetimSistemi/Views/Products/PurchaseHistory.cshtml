@@ -1,0 +1,101 @@
+﻿@model IEnumerable<CRMYonetimSistemi.Models.ProductPurchaseHistory>
+@using CRMYonetimSistemi.Models
+
+@{
+    ViewData["Title"] = "Ürün Alım Geçmişi";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <a asp-action="Index" class="btn btn-secondary">Ürün Listesine Dön</a>
+
+    @if (Model.Any())
+    {
+        <div class="btn-group">
+            <button type="button" class="btn btn-danger dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                Tüm Geçmişi Sil
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                    <form asp-action="ClearPurchaseHistory" asp-route-adjustStock="false" method="post" onsubmit="return confirm('TÜM alım geçmişini silmek istediğinizden emin misiniz? Ürün stokları DEĞİŞMEYECEKTİR!');">
+                        <button type="submit" class="dropdown-item">Sadece Tüm Geçmişi Sil</button>
+                    </form>
+                </li>
+                <li>
+                    <form asp-action="ClearPurchaseHistory" asp-route-adjustStock="true" method="post" onsubmit="return confirm('TÜM alım geçmişini silip, TÜM ürünlerin stoklarını SIFIRLAMAK istediğinizden emin misiniz? Bu işlem geri alınamaz!');">
+                        <button type="submit" class="dropdown-item text-danger">Geçmişi Sil ve Stokları Sıfırla</button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    }
+</div>
+
+<table class="table table-striped table-bordered align-middle">
+    <thead class="thead-dark">
+        <tr>
+            <th>Alım Tarihi</th>
+            <th>Ürün</th>
+            <th>Miktar (Adet)</th>
+            <th>Birim Fiyatı</th>
+            <th>Toplam Kargo Maliyeti</th>
+            <th>Para Birimi (Ürün/Kargo)</th> 
+            <th>Döviz Kuru</th>
+            <th>Toplam Maliyet (TRY)</th>
+            <th style="width: 150px;">İşlemler</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (!Model.Any())
+        {
+            <tr>
+                <td colspan="9" class="text-center">Henüz bir alım kaydı bulunmamaktadır.</td>
+            </tr>
+        }
+        else
+        {
+            @foreach (var item in Model)
+            {
+                // Ürün para birimine göre sembolü belirle
+                var productCurrencySymbol = item.ProductCurrency == CurrencyType.USD ? "$" : "₺";
+                // Kargo para birimine göre sembolü belirle
+                var shippingCurrencySymbol = item.ShippingCurrency == CurrencyType.USD ? "$" : "₺";
+
+                <tr>
+                    <td>@item.PurchaseDate.ToString("dd.MM.yyyy HH:mm")</td>
+                    <td>@item.Product?.Name</td>
+                    <td>@item.Quantity</td>
+                    <td>@productCurrencySymbol@item.ProductPricePerUnit.ToString("N2")</td> @* Ürün para birimi sembolü kullanıldı *@
+                    <td>
+                        @* Toplam Kargo Maliyetini direkt modelden al, currency sembolünü kullan *@
+                        @shippingCurrencySymbol@item.ShippingCost.ToString("N2")
+                    </td>
+                    <td>@item.ProductCurrency.ToString() / @item.ShippingCurrency.ToString()</td> @* Her iki para birimi de gösterildi *@
+                    <td>@(item.ExchangeRate?.ToString("N4") ?? "-")</td>
+                    <td>@item.TotalCostInTRY.ToString("C2")</td>
+                    <td>
+                        <div class="btn-group">
+                            <a asp-action="EditPurchase" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Düzenle</a>
+                            <button type="button" class="btn btn-sm btn-danger dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                Sil
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <form asp-action="DeletePurchase" asp-route-id="@item.Id" asp-route-adjustStock="false" method="post" onsubmit="return confirm('Sadece bu geçmiş kaydını silmek istediğinizden emin misiniz? Stok miktarı DEĞİŞMEYECEKTİR.');">
+                                        <button type="submit" class="dropdown-item">Sadece Geçmişi Sil</button>
+                                    </form>
+                                </li>
+                                <li>
+                                    <form asp-action="DeletePurchase" asp-route-id="@item.Id" asp-route-adjustStock="true" method="post" onsubmit="return confirm('Bu geçmiş kaydını silip, ilgili ürünün stoğunu DÜZELTMEK istediğinizden emin misiniz?');">
+                                        <button type="submit" class="dropdown-item text-danger">Sil ve Stoğu Düzelt</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>

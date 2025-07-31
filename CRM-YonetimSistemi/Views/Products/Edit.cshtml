@@ -4,8 +4,9 @@
     ViewData["Title"] = "Ürünü Düzenle";
 }
 
-<h1>Ürünü Düzenle</h1>
+<h1>@ViewData["Title"]</h1>
 
+<h4>Ürün</h4>
 <hr />
 <div class="row">
     <div class="col-md-6">
@@ -13,42 +14,16 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
 
-            @* CreatedAt ve CalculatedCost gibi otomatik ayarlanan alanlar formda yer almaz *@
-
             <div class="form-group mb-3">
                 <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
+                <input asp-for="Name" class="form-control" autofocus />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
-            <div class="form-group mb-3">
-                <label asp-for="ProductPriceInUSD" class="control-label"></label>
-                <input asp-for="ProductPriceInUSD" class="form-control" />
-                <span asp-validation-for="ProductPriceInUSD" class="text-danger"></span>
-            </div>
-            <div class="form-group mb-3">
-                <label asp-for="Kg" class="control-label"></label>
-                <input asp-for="Kg" class="form-control" />
-                <span asp-validation-for="Kg" class="text-danger"></span>
-            </div>
-            <div class="form-group mb-3">
-                <label asp-for="ShippingCostPerKg" class="control-label"></label>
-                <input asp-for="ShippingCostPerKg" class="form-control" />
-                <span asp-validation-for="ShippingCostPerKg" class="text-danger"></span>
-            </div>
-            <div class="form-group mb-3">
-                <label asp-for="ExchangeRate" class="control-label"></label>
-                <input asp-for="ExchangeRate" class="form-control" />
-                <span asp-validation-for="ExchangeRate" class="text-danger"></span>
-            </div>
-            <div class="form-group mb-3">
-                <label asp-for="DefaultSellingPrice" class="control-label"></label>
-                <input asp-for="DefaultSellingPrice" class="form-control" />
-                <span asp-validation-for="DefaultSellingPrice" class="text-danger"></span>
-            </div>
+
             <div class="form-group mb-3">
                 <label asp-for="Stock" class="control-label"></label>
-                <input asp-for="Stock" class="form-control" />
-                <span asp-validation-for="Stock" class="text-danger"></span>
+                <input asp-for="Stock" class="form-control" readonly />
+                <span class="form-text">Stok miktarı bu ekrandan değiştirilemez.</span>
             </div>
 
             <div class="form-group mt-4">
@@ -58,7 +33,6 @@
         </form>
     </div>
 </div>
-
 
 @section Scripts {
     @{
