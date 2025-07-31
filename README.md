@@ -107,10 +107,10 @@ Projeyi yerel makinenizde kurmak ve çalıştırmak için aşağıdaki adımlar�
 
     ```csharp
     // ESKİ HALİ:
-    // await DbSeeder.SeedRolesAndSuperAdminAsync(services);
+     await DbSeeder.SeedRolesAndSuperAdminAsync(services);
 
     // YENİ HALİ:
-    // await DbSeeder.SeedRolesAndSuperAdminAsync(services); // Bu satırı devre dışı bırakın.
+    // await DbSeeder.SeedRolesAndSuperAdminAsync(services); // Bu satırı devre dışı bırakın ya da silin.
     ```
 Bu işlemi yaptıktan sonra uygulama her başladığında yeniden kullanıcı oluşturmaya çalışmaz ve kodunuzda gereksiz bir işlem kalmaz.
 
@@ -119,10 +119,32 @@ Bu işlemi yaptıktan sonra uygulama her başladığında yeniden kullanıcı ol
 ## 📋 Uygulama Kullanım Adımları
 
 1.  Uygulama açıldığında "Giriş Yap" sayfasına gidin.
-2.  **Kullanıcı Adı:** `superadmin`
+2.  **Kullanıcı Adı:** `DbSeeder.cs` dosyasında belirlediğiniz kullanıcı adı ile giriş yapın.
 3.  **Şifre:** `DbSeeder.cs` dosyasında belirlediğiniz şifre ile giriş yapın.
 4.  Giriş yaptıktan sonra, üst menüdeki **"Kullanıcı Yönetimi"** linkinden yeni kullanıcılar oluşturabilir ve rollerini yönetebilirsiniz.
 5.  Diğer menü linklerini kullanarak müşteri, ürün, satış, gider ve ödeme kayıtları oluşturmaya başlayabilirsiniz.
+
+---
+
+## 📷 Uygulama Görselleri
+**Kontrol Paneli**
+<img width="1920" height="717" alt="Dashboard" src="https://github.com/user-attachments/assets/52a2c0b3-dad3-4d96-a2b5-415bd57f9b7a" />
+**Kullanıcı Yönetimi**
+<img width="1920" height="513" alt="UserManagement" src="https://github.com/user-attachments/assets/cce6727c-3107-4dff-b256-4c2f705c54bb" />
+**Yeni Ürün Alımı**
+<img width="1516" height="883" alt="BuyingNewItem" src="https://github.com/user-attachments/assets/a3cc0cca-63a4-4125-90dd-38f062ccc86a" />
+**Ürün Alım Geçmişi**
+<img width="1915" height="370" alt="BuyingItemHistory" src="https://github.com/user-attachments/assets/53af42f5-8dd9-43d3-879b-9bdc865880ed" />
+**Ürün (stok) Yönetimi**
+<img width="1920" height="407" alt="ItemManagement" src="https://github.com/user-attachments/assets/2d6fee68-f790-4e82-a53c-32504cbbe996" />
+**Gider Listesi**
+<img width="1920" height="420" alt="ExpensesList" src="https://github.com/user-attachments/assets/32a5e19b-8050-4937-b15a-13aec0b6c339" />
+**Satış Kaydı Ekleme**
+<img width="1920" height="722" alt="NewSale" src="https://github.com/user-attachments/assets/cb28be3a-dd27-4c4b-b929-33253e01faec" />
+**Ödeme Kayıtları**
+<img width="1920" height="442" alt="TestPayment" src="https://github.com/user-attachments/assets/07e7c797-20fe-4ff9-bf49-e84526851965" />
+**Proforma Çıktısı**
+<img width="656" height="923" alt="Proforma" src="https://github.com/user-attachments/assets/d917e4e5-b0b0-497c-b418-c6d570168a63" />
 
 ---
 
